@@ -1,6 +1,10 @@
-import { Colors, Terminal } from "wglt";
+import { Black, Green, Red, White, Yellow } from "./RGB";
 
+import AnnoyingText from "./AnnoyingText";
+import Engine from "./Engine";
+import GradientRun from "./GradientRun";
 import PlasmaBall from "./PlasmaBall";
+import { Terminal } from "wglt";
 
 function loadEngine(parent: HTMLElement) {
   const cols = 60;
@@ -26,18 +30,37 @@ function loadEngine(parent: HTMLElement) {
   container.appendChild(canvas);
 
   const term = new Terminal(canvas, cols, rows, { maxFps: 10 });
-
-  const ball = new PlasmaBall(term, cols / 2, rows / 2);
-
-  let textColour = Colors.WHITE;
-
-  term.update = () => {
-    term.fillRect(0, 0, cols, rows, " ", undefined, 0);
-    ball.draw();
-
-    term.drawCenteredString(cols / 2, 4, "!! ELECTRO RAVE !!", textColour);
-    textColour = textColour === Colors.WHITE ? Colors.LIGHT_CYAN : Colors.WHITE;
-  };
+  const g = new Engine(term);
+  g.add(new PlasmaBall(g, cols / 4 - 5, rows / 2 - 5));
+  g.add(
+    new PlasmaBall(
+      g,
+      (cols / 4) * 2,
+      rows / 2 + 5,
+      12,
+      new GradientRun([
+        [0, Black],
+        [1, Red],
+        [2, Yellow],
+        [4, White],
+      ])
+    )
+  );
+  g.add(
+    new PlasmaBall(
+      g,
+      (cols / 4) * 3 + 5,
+      rows / 2 - 5,
+      12,
+      new GradientRun([
+        [0, Black],
+        [1, Green],
+        [2, Yellow],
+        [4, White],
+      ])
+    )
+  );
+  g.add(new AnnoyingText(term, cols / 2, 4, "!! ELECTRO RAVE !!"));
 }
 
 window.addEventListener("load", () => loadEngine(document.body));
